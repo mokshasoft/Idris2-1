@@ -395,8 +395,14 @@ compileExpr c tmpDir outputDir tm outfile
          libsfile <- traverse findLibraryFile $ map (<.> "a") (nub libsname)
          gsc <- coreLift findGSC
          gscBackend <- coreLift findGSCBackend
-         let cmd = gsc ++
-                   " -c " ++ gscBackend ++ " -o \"" ++ execPath ++ "\" \"" ++ srcPath ++ "\""
+         ds <- getDirectives Gambit
+         let gscCompileOpts =
+           case find (== "C") ds of
+                Nothing => " -exe -cc-options \"-Wno-implicit-function-declaration\" -ld-options \"" ++
+                   (showSep " " libsfile) ++ "\""
+                Just _ => " -c"
+         let cmd =
+           gsc ++ gscCompileOpts ++ " -o \"" ++ execPath ++ "\" \"" ++ srcPath ++ "\""
          ok <- coreLift $ system cmd
          if ok == 0
             then pure (Just execPath)
