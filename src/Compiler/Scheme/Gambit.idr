@@ -396,8 +396,7 @@ compileExpr c tmpDir outputDir tm outfile
          gsc <- coreLift findGSC
          gscBackend <- coreLift findGSCBackend
          let cmd = gsc ++
-                   " -exe " ++ gscBackend ++ " -cc-options \"-Wno-implicit-function-declaration\" -ld-options \"" ++
-                   (showSep " " libsfile) ++ "\" -o \"" ++ execPath ++ "\" \"" ++ srcPath ++ "\""
+                   " -c " ++ gscBackend ++ " -o \"" ++ execPath ++ "\" \"" ++ srcPath ++ "\""
          ok <- coreLift $ system cmd
          if ok == 0
             then pure (Just execPath)
